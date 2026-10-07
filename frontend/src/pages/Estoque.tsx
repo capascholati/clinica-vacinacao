@@ -23,7 +23,7 @@ const Estoque: FC = () => {
   const fetchVacinas = async () => {
     try {
       const token = localStorage.getItem('access_token');
-      const res = await fetch('http://localhost:3333/cadastros/vacinas', {
+      const res = await fetch('/cadastros/vacinas', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       const data = await res.json();
@@ -39,7 +39,7 @@ const Estoque: FC = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('access_token');
-      const res = await fetch('http://localhost:3333/cadastros/vacinas', {
+      const res = await fetch('/cadastros/vacinas', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

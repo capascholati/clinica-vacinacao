@@ -23,8 +23,8 @@ const Financeiro: FC = () => {
       const headers = { 'Authorization': `Bearer ${token}` };
 
       const [contasRes, caixaRes] = await Promise.all([
-        fetch('http://localhost:3333/financeiro/contas-receber', { headers }),
-        fetch('http://localhost:3333/financeiro/caixa/status', { headers }),
+        fetch('/financeiro/contas-receber', { headers }),
+        fetch('/financeiro/caixa/status', { headers }),
       ]);
 
       if (contasRes.ok) {
@@ -55,7 +55,7 @@ const Financeiro: FC = () => {
   const handleAbrirCaixa = async () => {
     try {
       const token = localStorage.getItem('access_token');
-      const res = await fetch('http://localhost:3333/financeiro/caixa/abrir', {
+      const res = await fetch('/financeiro/caixa/abrir', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -72,7 +72,7 @@ const Financeiro: FC = () => {
   const handleFecharCaixa = async () => {
     try {
       const token = localStorage.getItem('access_token');
-      const res = await fetch('http://localhost:3333/financeiro/caixa/fechar', {
+      const res = await fetch('/financeiro/caixa/fechar', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
       });

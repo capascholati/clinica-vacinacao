@@ -15,10 +15,10 @@ const Dashboard: FC = () => {
         const headers = { 'Authorization': `Bearer ${token}` };
 
         const [usuarios, vacinas, agendamentos, clientes] = await Promise.all([
-          fetch('http://localhost:3333/usuarios', { headers }).then((r) => r.json()).then((d) => d.length),
-          fetch('http://localhost:3333/cadastros/vacinas', { headers }).then((r) => r.json()).then((d) => d.length),
-          fetch('http://localhost:3333/agenda', { headers }).then((r) => r.json()).then((d) => d.length),
-          fetch('http://localhost:3333/clientes', { headers }).then((r) => r.json()).then((d) => d.length),
+          fetch('/usuarios', { headers }).then((r) => r.json()).then((d) => d.length),
+          fetch('/cadastros/vacinas', { headers }).then((r) => r.json()).then((d) => d.length),
+          fetch('/agenda', { headers }).then((r) => r.json()).then((d) => d.length),
+          fetch('/clientes', { headers }).then((r) => r.json()).then((d) => d.length),
         ]);
 
         setStats({ usuarios, vacinas, agendamentos, clientes });

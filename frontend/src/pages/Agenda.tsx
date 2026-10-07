@@ -20,7 +20,7 @@ const Agenda: FC = () => {
   const fetchAgendamentos = async () => {
     try {
       const token = localStorage.getItem('access_token');
-      const res = await fetch('http://localhost:3333/agenda', {
+      const res = await fetch('/agenda', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       const data = await res.json();

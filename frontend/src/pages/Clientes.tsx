@@ -22,7 +22,7 @@ const Clientes: FC = () => {
   const fetchClientes = async () => {
     try {
       const token = localStorage.getItem('access_token');
-      const res = await fetch('http://localhost:3333/clientes', {
+      const res = await fetch('/clientes', {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       const data = await res.json();
@@ -38,7 +38,7 @@ const Clientes: FC = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('access_token');
-      const res = await fetch('http://localhost:3333/clientes', {
+      const res = await fetch('/clientes', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

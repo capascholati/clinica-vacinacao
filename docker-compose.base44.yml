@@ -1,0 +1,84 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: clinica
+      POSTGRES_PASSWORD: clinica_dev
+      POSTGRES_DB: clinica
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clinica"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: on-failure
+
+  migrations:
+    image: postgres:16-alpine
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend/sql:/sql:ro
+    environment:
+      PGPASSWORD: clinica_dev
+    command:
+      - sh
+      - -c
+      - |
+        if ! psql -h db -U clinica -d clinica -tAc "SELECT 1 FROM information_schema.tables WHERE table_name='perfis'" | grep -q 1; then
+          echo "Applying migrations...";
+          psql -h db -U clinica -d clinica -f /sql/001_modulo1_auth.sql &&
+          psql -h db -U clinica -d clinica -f /sql/002_modulo2_estoque.sql &&
+          psql -h db -U clinica -d clinica -f /sql/003_modulo3_clientes_agenda.sql &&
+          psql -h db -U clinica -d clinica -f /sql/004_modulo4_financeiro.sql;
+          echo "Migrations applied.";
+        else
+          echo "Migrations already applied, skipping.";
+        fi
+    restart: "no"
+
+  backend:
+    image: node:22
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    command: ["sh", "-ec", "npm install && exec npm run dev"]
+    environment:
+      - PORT=3333
+      - DATABASE_URL=postgres://clinica:clinica_dev@db:5432/clinica
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3333/api/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    restart: on-failure
+
+  web:
+    image: node:22
+    working_dir: /app
+    volumes:
+      - ./frontend:/app
+    command: ["sh", "-ec", "npm install && exec npm run dev -- --host 0.0.0.0"]
+    environment:
+      - __VITE_ADDITIONAL_SERVER_ALLOWED_HOSTS
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "3000:5173"
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:5173/',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    restart: on-failure
+
+volumes:
+  pgdata:
